@@ -4,6 +4,8 @@ Backend de la aplicación **MarketGaming**, desarrollado con **Node.js** y **Exp
 
 Este servidor expone una API REST que se conecta a una base de datos **PostgreSQL** y gestiona funcionalidades como autenticación de usuarios, productos y transacciones del marketplace de videojuegos.
 
+El proyecto utiliza **módulos ES** (`import` / `export`), configurados con `"type": "module"` en `package.json`.
+
 ---
 
 ## Tecnologías principales
@@ -100,7 +102,7 @@ npm test
 | Carpeta / Archivo | Función |
 | ----------------- | ------- |
 | `index.js` | Punto de entrada de la aplicación. Carga las variables de entorno y levanta el servidor en el puerto configurado. |
-| `src/app.js` | Configura la instancia de Express: middlewares globales, rutas y exporta la aplicación para poder ser usada en pruebas. |
+| `src/app.js` | Configura la instancia de Express con los middlewares globales (`cors`, `express.json`) y exporta la aplicación para poder ser usada en pruebas. |
 | `src/config/` | Contiene archivos de configuración, como la conexión a PostgreSQL y la carga de variables de entorno. |
 | `src/controller/` | Agrupa los controladores. Cada controlador recibe las peticiones HTTP, ejecuta la lógica de negocio y devuelve las respuestas correspondientes. |
 | `src/middlewares/` | Middlewares reutilizables, por ejemplo para verificar tokens JWT, manejar errores o registrar peticiones. |
@@ -120,9 +122,14 @@ npm test
 
 ---
 
+## Convenciones
+
+- Se usan **módulos ES**: `import` / `export` en lugar de `require` / `module.exports`.
+- Las importaciones relativas deben incluir la extensión del archivo (`.js`).
+
 ## Estado actual
 
-> **Nota:** Este backend se encuentra en etapa inicial. La estructura de carpetas está definida, pero las implementaciones de rutas, controladores, modelos, middlewares y validadores aún están pendientes.
+> **Nota:** Este backend se encuentra en etapa inicial. La instancia de Express ya está configurada en `src/app.js` y la estructura de carpetas está definida. Aún están pendientes las implementaciones de rutas, controladores, modelos, middlewares y validadores.
 
 ---
 
