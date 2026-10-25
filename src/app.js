@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import usersRoutes from './routes/user.routes.js';
 import categoriesRoutes from './routes/category.routes.js';
+
 const app = express();
 
 app.use(cors());
@@ -19,4 +20,3 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
-

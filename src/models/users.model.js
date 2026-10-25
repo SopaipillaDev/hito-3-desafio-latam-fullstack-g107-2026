@@ -16,3 +16,12 @@ export const createUser = async ({ name, email, password, avatar_url }) => {
   const { rows } = await pool.query(query, values);
   return rows[0];
 };
+
+export const userMe = async (idUser) => {
+  const query = 'SELECT * FROM users WHERE id = $1';
+  const values = [idUser]
+  const {rows} = await pool.query(query, values);
+  console.log('Consultaaaaaaaa')
+  console.log(rows[0])
+  return rows[0];
+}
