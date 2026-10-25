@@ -84,18 +84,11 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const aboutMe = async (req, res, next) => {
+export const aboutMe = async (req, res) => {
   console.log("aboutMe Iniciado");
-  try {
-    const authorization = req.get("Authorization");
-    if (!authorization || !authorization.startsWith("Bearer ")) {
-      return res.status(401).json({
-        error: "Token no proporcionado",
-      });
-    }
-    const token = authorization.split(" ")[1];
-    const { id } = jwt.verify(token, JWT_SECRET);
-    const usuario = await UsersModel.userMe(id);
+  console.log('Req:', req.id)
+
+    const usuario = await UsersModel.userMe(req.user.id);
     res.json({
       id: usuario.id,
       name: usuario.name,
@@ -104,7 +97,5 @@ export const aboutMe = async (req, res, next) => {
       role: usuario.role,
       created_at: usuario.created_at,
     });
-  } catch (error) {
-    next(error);
-  }
+
 }; 
