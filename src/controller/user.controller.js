@@ -5,9 +5,10 @@ import {
   validateLogin,
 } from "../validators/userValidator.js";
 import * as UsersModel from "../models/users.model.js";
+import { json } from "express";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+const JWT_EXPIRES_IN= process.env.JWT_EXPIRES_IN;
 
 export const register = async (req, res, next) => {
   console.log('Registrar Usuario Iniciado');
@@ -82,3 +83,28 @@ export const login = async (req, res, next) => {
     next(err);
   }
 };
+
+export const aboutMe = async (req, res, next) => {
+  console.log("aboutMe Iniciado");
+  try {
+    const authorization = req.get("Authorization");
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      return res.status(401).json({
+        error: "Token no proporcionado",
+      });
+    }
+    const token = authorization.split(" ")[1];
+    const { id } = jwt.verify(token, JWT_SECRET);
+    const usuario = await UsersModel.userMe(id);
+    res.json({
+      id: usuario.id,
+      name: usuario.name,
+      email: usuario.email,
+      avatar_url: usuario.avatar_url,
+      role: usuario.role,
+      created_at: usuario.created_at,
+    });
+  } catch (error) {
+    next(error);
+  }
+}; 
