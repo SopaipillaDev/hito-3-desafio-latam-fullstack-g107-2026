@@ -25,3 +25,4 @@ export const userMe = async (idUser) => {
   console.log(rows[0])
   return rows[0];
 }
+

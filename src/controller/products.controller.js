@@ -1,4 +1,4 @@
-import { ObtenerProductos, ContarProductos } from '../models/products.models.js';
+import * as ProductsModel from '../models/products.models.js';
 
 
 export const obtenerProductos = async (req, res) => {
@@ -10,10 +10,10 @@ export const obtenerProductos = async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Número de página, por defecto 1
 
   // 2. Llamar al modelo para obtener productos con paginación y filtros
-  const productos = await ObtenerProductos({ category, search, order_by, limit, page });
+  const productos = await ProductsModel.obtenerProductos({ category, search, order_by, limit, page });
 
   // 3. Obtener el total para metadata de paginación
-  const total = await ContarProductos({ category, search });
+  const total = await ProductsModel.contarProductos({ category, search });
 
   // 4. Responder con los datos
   res.json({
@@ -28,3 +28,22 @@ export const obtenerProductos = async (req, res) => {
   });
 };
 
+export const obtenerProductoId = async (req, res) => {
+const { id } = req.params;
+// Llamar al modelo para buscar el producto por id
+  const producto = await ProductsModel.obtenerProductoPorId(id);
+
+  //Si no existe el producto, responder 404
+  if (!producto) {
+    return res.status(404).json({
+      success: false,
+      error: 'Producto no encontrado',
+    });
+  }
+
+  //Responde con el producto
+  res.json({
+    success: true,
+    data: producto,
+  });
+};
