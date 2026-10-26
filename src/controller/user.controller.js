@@ -5,14 +5,11 @@ import {
   validateLogin,
 } from "../validators/userValidator.js";
 import * as UsersModel from "../models/users.model.js";
-import { json } from "express";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN= process.env.JWT_EXPIRES_IN;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
 
 export const register = async (req, res, next) => {
-  console.log('Registrar Usuario Iniciado');
-  
   try {
     const errors = validateRegister(req.body); //Validacion de entradas
     if (errors.length > 0) {//si  hay errores en la validación anterior respoder error
@@ -84,18 +81,18 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const aboutMe = async (req, res) => {
-  console.log("aboutMe Iniciado");
-  console.log('Req:', req.id)
-
+export const aboutMe = async (req, res, next) => {
+  try {
     const usuario = await UsersModel.userMe(req.user.id);
-    res.json({
-      id: usuario.id,
-      name: usuario.name,
-      email: usuario.email,
-      avatar_url: usuario.avatar_url,
-      role: usuario.role,
-      created_at: usuario.created_at,
-    });
 
-}; 
+    if (!usuario) {
+      const err = new Error("Usuario no encontrado.");
+      err.status = 404;
+      throw err;
+    }
+
+    res.json(usuario);
+  } catch (err) {
+    next(err);
+  }
+};

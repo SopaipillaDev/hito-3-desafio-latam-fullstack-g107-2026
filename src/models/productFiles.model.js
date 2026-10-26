@@ -1,6 +1,8 @@
 import pool from '../config/db.js';
 
 export const productExists = async (productId) => {
+  if (!Number.isInteger(Number(productId))) return false;
+
   const query = `
     SELECT id
     FROM products
@@ -33,7 +35,7 @@ export const createProductFile = async ({
     productId,
     file_url,
     file_name,
-    file_size
+    file_size ?? null
   ];
 
   const { rows } = await pool.query(query, values);

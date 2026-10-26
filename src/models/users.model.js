@@ -18,10 +18,7 @@ export const createUser = async ({ name, email, password, avatar_url }) => {
 };
 
 export const userMe = async (idUser) => {
-  const query = 'SELECT * FROM users WHERE id = $1';
-  const values = [idUser]
-  const {rows} = await pool.query(query, values);
-  console.log('Consultaaaaaaaa')
-  console.log(rows[0])
-  return rows[0];
-}
+  const query = 'SELECT id, name, email, avatar_url, role, created_at FROM users WHERE id = $1';
+  const { rows } = await pool.query(query, [idUser]);
+  return rows[0] || null;
+};
