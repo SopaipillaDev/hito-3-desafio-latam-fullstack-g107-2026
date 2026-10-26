@@ -2,7 +2,7 @@
 
 Backend de la aplicación **MarketGaming**, desarrollado con **Node.js** y **Express** como parte del hito 3 del bootcamp Full Stack de Desafío Latam.
 
-Este servidor expone una API REST que se conecta a una base de datos **PostgreSQL** y gestiona funcionalidades como autenticación de usuarios, productos y transacciones del marketplace de videojuegos.
+Este servidor expone una API REST que se conecta a una base de datos **PostgreSQL** y gestiona autenticación de usuarios, catálogo, carrito, órdenes y administración de un marketplace de cursos y guías para aprender a desarrollar videojuegos.
 
 El proyecto utiliza **módulos ES** (`import` / `export`), configurados con `"type": "module"` en `package.json`.
 
@@ -24,7 +24,7 @@ El proyecto utiliza **módulos ES** (`import` / `export`), configurados con `"ty
 ## Requisitos previos
 
 - Node.js instalado
-- PostgreSQL en ejecución
+- Base de datos PostgreSQL (Supabase o local), creada con los scripts de `database/`
 - Variables de entorno configuradas (ver `.env.example`)
 
 ---
@@ -127,9 +127,69 @@ npm test
 - Se usan **módulos ES**: `import` / `export` en lugar de `require` / `module.exports`.
 - Las importaciones relativas deben incluir la extensión del archivo (`.js`).
 
-## Estado actual
+## Base de datos
 
-> **Nota:** Este backend se encuentra en etapa inicial. La instancia de Express ya está configurada en `src/app.js` y la estructura de carpetas está definida. Aún están pendientes las implementaciones de rutas, controladores, modelos, middlewares y validadores.
+1. Crear la base en Supabase (SQL Editor) o en PostgreSQL local.
+2. Ejecutar `database/schema.sql` (crea las 11 tablas) y luego `database/seed.sql` (datos de prueba).
+3. En `.env`: con Supabase usar `DB_SSL=true`; con PostgreSQL local, `DB_SSL=false`.
+
+> `schema.sql` y `seed.sql` **borran los datos** antes de crear o insertar. Córranlos solo avisando al equipo.
+
+## Cuentas de prueba
+
+| Rol | Email | Contraseña |
+| --- | ----- | ---------- |
+| Administrador | admin@marketgaming.cl | admin123 |
+| Cliente | ana.rojas@email.cl | 123456 |
+
+Los otros clientes del seed (diego.munoz, camila.silva y benjamin.torres, todos `@email.cl`) también usan `123456`.
+
+## Endpoints
+
+| Método | Ruta | Acceso |
+| ------ | ---- | ------ |
+| POST | /users | Público |
+| POST | /login | Público |
+| GET | /users/me | Usuario |
+| GET | /categories | Público |
+| POST | /categories | Admin |
+| GET | /products | Público (filtros: category, search, order_by, limit, page) |
+| GET | /products/:id | Público |
+| POST | /products | Admin |
+| PUT | /products/:id | Admin |
+| DELETE | /products/:id | Admin |
+| GET | /products/:id/images | Público |
+| POST | /products/:id/images | Admin |
+| POST | /products/:id/files | Admin |
+| GET | /products/:id/reviews | Público |
+| POST | /products/:id/reviews | Usuario |
+| GET | /favorites | Usuario |
+| POST | /favorites | Usuario |
+| DELETE | /favorites/:product_id | Usuario |
+| GET | /cart | Usuario |
+| POST | /cart/products | Usuario |
+| PUT | /cart/products/:id | Usuario |
+| DELETE | /cart/products/:id | Usuario |
+| POST | /orders | Usuario |
+| GET | /orders | Usuario |
+| GET | /orders/:id | Usuario (dueño) o Admin |
+| POST | /orders/:id/payment | Usuario (pago simulado) |
+| GET | /orders/:id/files | Usuario (orden pagada) |
+| GET | /admin/orders | Admin |
+| GET | /admin/stats | Admin |
+
+"Usuario" significa que la ruta pide el header `Authorization: Bearer <token>` que entrega `POST /login`.
+
+## Rúbrica del Hito 3
+
+| Requerimiento | Dónde está |
+| ------------- | ---------- |
+| 1. Proyecto npm y dependencias | `package.json` |
+| 2. Paquete pg | `src/config/db.js` y `src/models/` |
+| 3. Autenticación y autorización con JWT | `src/controller/user.controller.js` (firma), `src/middlewares/auth.middleware.js` (verifica), `src/middlewares/admin.middleware.js` (rol) |
+| 4. CORS | `src/app.js` |
+| 5. Middlewares con next | `src/middlewares/auth.middleware.js` y `src/middlewares/admin.middleware.js` |
+| 6. Tests | `tests/api.spec.js` (`npm test`) |
 
 ---
 

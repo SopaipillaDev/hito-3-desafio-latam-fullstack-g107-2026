@@ -34,6 +34,12 @@ export const createProductImage = async (req, res, next) => {
 
     const { url, alt_text, is_cover, position } = req.body;
 
+    if (!url || String(url).trim() === '') {
+      const error = new Error('url es obligatoria');
+      error.status = 400;
+      throw error;
+    }
+
     const image = await ProductImagesModel.createProductImage({
       productId: id,
       url,

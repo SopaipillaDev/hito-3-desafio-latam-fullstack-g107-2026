@@ -31,6 +31,10 @@ export const createCategory = async (req, res, next) => {
 
     res.status(201).json(category);
   } catch (error) {
+    if (error.code === '23505') {
+      error.status = 409;
+      error.message = 'Ya existe una categoría con ese slug.';
+    }
     next(error);
   }
 };

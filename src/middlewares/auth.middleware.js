@@ -1,29 +1,27 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+// Revisa el token del header Authorization: "Bearer <token>"
+export const authMiddleware = (req, res, next) =>
+{
+    const authorization = req.header('Authorization') || '';
+    const token = authorization.startsWith('Bearer ') ? authorization.split(' ')[1] : null;
 
-export const authMiddleware = (req, res, next) => {
-  console.log("entro a la authmiddleware");
-  const authorization = req.header("Authorization");
-  //console.log("authorization", authorization);
-
-  try {
-    if (!authorization || !authorization.startsWith("Bearer ")) {
-      return res.status(401).json({
-        error: "Token no proporcionado o no valido",
-      });
+    if (!token)
+    {
+        return res.status(401).json({ message: 'Token inválido o ausente' });
     }
 
-    const token = authorization.split(" ")[1];
-    //console.log("PAsa el splitt, token:", token);
+    let usuario;
 
-    const decodeToken = jwt.verify(token, JWT_SECRET);
-    //console.log("PAsa el decodeToken, token:", decodeToken);
+    try
+    {
+        usuario = jwt.verify(token, process.env.JWT_SECRET);
+    }
+    catch (error)
+    {
+        return res.status(401).json({ message: 'Token inválido o ausente' });
+    }
 
-    req.user = decodeToken;
-
+    req.user = usuario;   // { id, email, role }
     next();
-  } catch (error) {
-    next(error);
-  }
 };

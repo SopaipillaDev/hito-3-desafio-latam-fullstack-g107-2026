@@ -35,9 +35,9 @@ export const createProductImage = async ({
   const values = [
     productId,
     url,
-    alt_text,
-    is_cover,
-    position
+    alt_text || null,
+    is_cover ?? false,
+    position ?? 1
   ];
 
   const { rows } = await pool.query(query, values);
@@ -46,6 +46,8 @@ export const createProductImage = async ({
 };
 
 export const productExists = async (productId) => {
+  if (!Number.isInteger(Number(productId))) return false;
+
   const query = `
     SELECT id
     FROM products

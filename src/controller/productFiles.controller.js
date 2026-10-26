@@ -5,6 +5,12 @@ export const createProductFile = async (req, res, next) => {
     const { id } = req.params;
     const { file_url, file_name, file_size } = req.body;
 
+    if (!file_url || !file_name) {
+      const error = new Error('file_url y file_name son obligatorios');
+      error.status = 400;
+      throw error;
+    }
+
     const productExists = await ProductFilesModel.productExists(id);
 
     if (!productExists) {
