@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import usersRoutes from './routes/user.routes.js';
+import productsRoutes from './routes/products.routes.js'
 import categoriesRoutes from './routes/category.routes.js';
 import productImagesRoutes from './routes/productImages.routes.js';
 import productFilesRoutes from './routes/productFiles.routes.js';
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/users', usersRoutes);
+app.use('/products', productsRoutes)
 app.use('/categories', categoriesRoutes);
 app.use('/products', productImagesRoutes);
 app.use('/products', productFilesRoutes);

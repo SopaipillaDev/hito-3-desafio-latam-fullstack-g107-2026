@@ -4,8 +4,6 @@ import { authMiddleware } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-console.log('entro a la ruta')
-
 router.post('/', register);
 router.post('/login', login);
 router.get('/me', authMiddleware, aboutMe); 
