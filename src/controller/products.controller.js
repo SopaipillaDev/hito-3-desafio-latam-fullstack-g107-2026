@@ -47,3 +47,80 @@ const { id } = req.params;
     data: producto,
   });
 };
+
+export const nuevoProducto = async (req, res) => {
+  // 1. Extraer los datos del body
+  const { category_id, name, slug, description, price, status } = req.body;
+
+  // 2. Validar los campos obligatorios
+  if (!category_id || !name || !slug || !price || !status) {
+    return res.status(400).json({
+      success: false,
+      error: 'category_id, name, slug, price y status son obligatorios',
+    });
+  }
+
+  // 3. Llamar al modelo para crear el producto
+  const producto = await ProductsModel.crearProducto({ category_id, name, slug, description, price, status });
+
+  // 4. Responder con el producto creado (201 = Created)
+  res.status(201).json({
+    success: true,
+    data: producto,
+  });
+};
+
+export const editarProducto = async (req, res) => {
+  // 1. Obtener el id de la ruta (PUT /products/5 → req.params.id)
+  const { id } = req.params;
+
+  // 2. Extraer los datos del body
+  const { category_id, name, slug, description, price, status } = req.body;
+
+  // 3. Validar los campos obligatorios
+  if (!category_id || !name || !slug || !price || !status) {
+    return res.status(400).json({
+      success: false,
+      error: 'category_id, name, slug, price y status son obligatorios',
+    });
+  }
+
+  // 4. Llamar al modelo para actualizar el producto
+  const producto = await ProductsModel.actualizarProducto(id, { category_id, name, slug, description, price, status });
+
+  // 5. Si ningún registro coincidió con el id, responder 404
+  if (!producto) {
+    return res.status(404).json({
+      success: false,
+      error: 'Producto no encontrado',
+    });
+  }
+
+  // 6. Responder con el producto actualizado
+  res.json({
+    success: true,
+    data: producto,
+  });
+};
+
+export const borrarProducto = async (req, res) => {
+  // 1. Obtener el id de la ruta (DELETE /products/5 → req.params.id)
+  const { id } = req.params;
+
+  // 2. Llamar al modelo para eliminar el producto
+  const producto = await ProductsModel.eliminarProducto(id);
+
+  // 3. Si ningún registro coincidió con el id, responder 404
+  if (!producto) {
+    return res.status(404).json({
+      success: false,
+      error: 'Producto no encontrado',
+    });
+  }
+
+  // 4. Confirmar la eliminación
+  res.json({
+    success: true,
+    message: 'Producto eliminado',
+  });
+};

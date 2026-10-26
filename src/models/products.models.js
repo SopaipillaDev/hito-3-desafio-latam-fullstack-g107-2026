@@ -103,3 +103,54 @@ export const obtenerProductoPorId = async (idProducto) => {
   const { rows } = await pool.query(query, values);
   return rows[0]; // Retorna el producto o undefined si no existe
 };
+
+
+export const crearProducto = async ({ category_id, name, slug, description, price, status }) => {
+  // Los valores variables van como parámetros ($1...$6) para evitar inyección SQL
+  // NOW() va directo en el SQL porque es una función de Postgres, no un valor del usuario
+  const query = `
+    INSERT INTO products (category_id, name, slug, description, price, status, created_at, updated_at)
+    VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+    RETURNING *;
+  `;
+  const values = [category_id, name, slug, description, price, status];
+
+  const { rows } = await pool.query(query, values);
+  return rows[0]; // Retorna el producto recién creado
+};
+
+/**
+ * Actualiza un producto por su ID
+ *
+ * @param {number} idProducto - ID del producto a actualizar
+ * @param {Object} datos - Nuevos datos del producto
+ * @returns {Promise<Object|undefined>} - El producto actualizado o undefined si el id no existe
+ */
+export const actualizarProducto = async (idProducto, { category_id, name, slug, description, price, status }) => {
+  // updated_at se regenera con NOW(); created_at no se toca (es la fecha de creación)
+  const query = `
+    UPDATE products
+    SET category_id = $1, name = $2, slug = $3, description = $4, price = $5, status = $6, updated_at = NOW()
+    WHERE id = $7
+    RETURNING *;
+  `;
+  const values = [category_id, name, slug, description, price, status, idProducto];
+
+  const { rows } = await pool.query(query, values);
+  return rows[0]; // Retorna el producto actualizado o undefined si el id no existe
+};
+
+/**
+ * Elimina un producto por su ID
+ *
+ * @param {number} idProducto - ID del producto a eliminar
+ * @returns {Promise<Object|undefined>} - El producto eliminado o undefined si no existía
+ */
+export const eliminarProducto = async (idProducto) => {
+  // RETURNING * permite saber si se eliminó algo (si no, rows viene vacío)
+  const query = 'DELETE FROM products WHERE id = $1 RETURNING *;';
+  const values = [idProducto];
+
+  const { rows } = await pool.query(query, values);
+  return rows[0]; // Retorna el producto eliminado o undefined si no existía
+};
