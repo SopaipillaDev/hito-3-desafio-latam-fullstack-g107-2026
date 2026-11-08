@@ -96,4 +96,18 @@ describe('API MarketGaming', () =>
         const res = await request(app).get('/admin/stats').set('Authorization', `Bearer ${tokenCliente}`);
         expect(res.statusCode).toBe(403);
     });
+
+    // En el seed, Ana ya pagó los cursos 1 y 4 (orden 1). Estas pruebas no crean filas:
+    // el servidor rechaza la petición antes de escribir.
+    it('POST /cart/products responde 409 con un curso ya comprado', async () =>
+    {
+        const res = await request(app).post('/cart/products').set('Authorization', `Bearer ${tokenCliente}`).send({ product_id: 1, quantity: 1 });
+        expect(res.statusCode).toBe(409);
+    });
+
+    it('POST /orders responde 409 si incluye un curso ya comprado', async () =>
+    {
+        const res = await request(app).post('/orders').set('Authorization', `Bearer ${tokenCliente}`).send({ items: [{ product_id: 4, quantity: 1 }] });
+        expect(res.statusCode).toBe(409);
+    });
 });

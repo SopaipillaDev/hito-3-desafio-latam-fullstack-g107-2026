@@ -52,6 +52,15 @@ export const createOrder = async (req, res, next) =>
         }
 
         const ids = items.map((item) => Number(item.product_id));
+
+        // Defensa en profundidad: aunque el curso haya quedado en el carrito, no se cobra dos veces
+        const comprados = await OrdersModel.getPurchasedProductIds(req.user.id, ids);
+
+        if (comprados.length > 0)
+        {
+            throw crearError(409, 'Ya compraste uno de estos cursos. Quítalo del carrito para continuar.');
+        }
+
         const productos = await OrdersModel.getPublishedProducts(ids);
 
         // El precio sale de la base de datos, nunca del frontend
@@ -107,6 +116,15 @@ export const payOrder = async (req, res, next) =>
         if (orden.status === 'cancelled')
         {
             throw crearError(409, 'La orden fue cancelada');
+        }
+
+        // Una orden pendiente antigua podría traer un curso que ya se pagó en otra orden
+        const lineas = await OrdersModel.getOrderItems(orden.id);
+        const comprados = await OrdersModel.getPurchasedProductIds(req.user.id, lineas.map((linea) => linea.product_id));
+
+        if (comprados.length > 0)
+        {
+            throw crearError(409, 'Esta orden incluye un curso que ya compraste');
         }
 
         if (req.body.result === 'rejected')
