@@ -9,6 +9,21 @@ export const getPublishedProducts = async (ids) =>
     return rows;
 };
 
+// De una lista de cursos, devuelve los que el usuario YA pagó.
+// Un curso digital se compra una sola vez: se usa antes de agregar al carrito,
+// de crear la orden y de pagarla. Las órdenes canceladas o rechazadas no cuentan.
+export const getPurchasedProductIds = async (userId, productIds) =>
+{
+    const consulta = `
+        SELECT DISTINCT op.product_id
+        FROM orders o
+        JOIN order_products op ON op.order_id = o.id
+        WHERE o.user_id = $1 AND o.status = 'paid' AND op.product_id = ANY($2::int[])`;
+    const { rows } = await pool.query(consulta, [userId, productIds]);
+
+    return rows.map((fila) => fila.product_id);
+};
+
 // Crea la orden y sus líneas en una TRANSACCIÓN: se guardan las dos cosas o ninguna
 export const createOrder = async (userId, total, lineas) =>
 {

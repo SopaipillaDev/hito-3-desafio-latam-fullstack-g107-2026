@@ -1,5 +1,6 @@
 import * as CartModel from '../models/cart.model.js';
 import * as ProductsModel from '../models/products.model.js';
+import * as OrdersModel from '../models/orders.model.js';
 
 const crearError = (status, message) =>
 {
@@ -46,6 +47,14 @@ export const addProduct = async (req, res, next) =>
         if (!existe)
         {
             throw crearError(404, 'Producto no encontrado');
+        }
+
+        // Un curso ya pagado no vuelve al carrito (antes se podía comprar dos veces)
+        const comprados = await OrdersModel.getPurchasedProductIds(req.user.id, [Number(req.body.product_id)]);
+
+        if (comprados.length > 0)
+        {
+            throw crearError(409, 'Ya compraste este curso. Lo encuentras en Mis compras.');
         }
 
         const cartId = await CartModel.getOrCreateCartId(req.user.id);
